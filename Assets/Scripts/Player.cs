@@ -43,7 +43,11 @@ public class Player : MonoBehaviour
 
         float rotationSpeed = 10f;
         // 采用插值平滑改变角色面朝方向
-        transform.forward = Vector3.Slerp(transform.forward, moveDir, rotationSpeed * Time.deltaTime);
+        if (isWalking)
+        {
+            transform.forward = Vector3.Slerp(transform.forward, moveDir, rotationSpeed * Time.deltaTime);
+        }
+        // Debug.Log(Time.deltaTime);
     }
 
     /// <summary>
