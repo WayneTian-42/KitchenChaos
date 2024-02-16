@@ -13,10 +13,11 @@ public class GameInput : MonoBehaviour
         playerInputActions = new PlayerInputActions();
         playerInputActions.Player.Enable();
     }
+
     /// <summary>
-    /// 获取归一化的输入向量
+    /// 获取归一化的二维输入向量
     /// </summary>
-    /// <returns>归一化的输入向量</returns>
+    /// <returns>归一化的二维输入向量</returns>
     public Vector2 GetInputVectorNormalized()
     {
         // 通过playerInputActions获取输入向量
