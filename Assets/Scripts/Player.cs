@@ -18,6 +18,42 @@ public class Player : MonoBehaviour
     // 记录上次交互方向
     private Vector3 lastInteractDir;
 
+    private void Start()
+    {
+        // OnInteractAction触发时，会执行GameInput_OnInteractAction函数
+        gameInput.OnInteractAction += GameInput_OnInteractAction;
+    }
+
+    /// <summary>
+    /// 交互函数，当按下交互键时会执行
+    /// </summary>
+    /// <param name="sender">发布事件者</param>
+    /// <param name="eventArgs">事件参数</param>
+    private void GameInput_OnInteractAction(object sender, System.EventArgs eventArgs)
+    {
+        Vector2 inputVector = gameInput.GetInputVectorNormalized();
+
+        // 移动方向
+        Vector3 moveDir = new Vector3(inputVector.x, 0, inputVector.y);
+
+        // 记录交互方向
+        if (moveDir != Vector3.zero)
+        {
+            lastInteractDir = moveDir;
+        }
+
+        float interactDis = 2f;
+        // 碰撞检测，添加图层
+        if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDis, counterLayerMask))
+        {
+            // 尝试获取ClearCounter
+            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+            {
+                clearCounter.Interact();
+            }
+        }
+    }
+
     private void Update()
     {
         HandleMovement();
@@ -78,14 +114,14 @@ public class Player : MonoBehaviour
             }
 
         }
-        
+
         // 没有物体时，才可以移动
         if (canMove)
         {
             // 注意运算顺序，先进行标量乘法，再进行矢量乘法
             transform.position += moveDistance * moveDir;
         }
-        
+
         // 移动方向不为0时说明在移动
         isWalking = (moveDir != Vector3.zero);
 
@@ -121,7 +157,7 @@ public class Player : MonoBehaviour
             // 尝试获取ClearCounter
             if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
             {
-                clearCounter.Interact();
+                // clearCounter.Interact();
             }
         }
     }
