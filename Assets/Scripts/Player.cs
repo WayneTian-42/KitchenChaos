@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IKitchenObjectParent
 {
     // 单例模式，外部可访问，只有内部能修改
     public static Player Instance { get; private set; }
@@ -29,13 +29,16 @@ public class Player : MonoBehaviour
     [SerializeField] private GameInput gameInput;
     // 计数器类的图层
     [SerializeField] private LayerMask counterLayerMask;
+    // 手持物品的位置
+    [SerializeField] private Transform kitchenObjectHoldPoint;
     // 记录选中的计数器
     private ClearCounter selectedCounter;
     // 角色是否在移动
     private bool isWalking;
-
     // 记录上次交互方向
     private Vector3 lastInteractDir;
+    // 手持物品
+    private KitchenObject kitchenObject;
 
     private void Awake()
     {
@@ -61,7 +64,7 @@ public class Player : MonoBehaviour
     {
         if (selectedCounter != null)
         {
-            selectedCounter.Interact();
+            selectedCounter.Interact(this);
         }
     }
 
@@ -196,5 +199,56 @@ public class Player : MonoBehaviour
         selectedCounter = clearCounter;
         // 通知事件订阅者，选中的计数器发生了改变
         OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs(selectedCounter));
+    }
+
+    /// <summary>
+    /// 获取角色抓取物品的位置
+    /// </summary>
+    /// <returns>角色抓取物品的位置</returns>
+    public Transform GetKitchenObjectFollowTransform()
+    {
+        return kitchenObjectHoldPoint;
+    }
+
+    /// <summary>
+    /// 设置角色的物品
+    /// </summary>
+    /// <param name="newKitchenObject">物品</param>
+    public void SetKitchenObject(KitchenObject newKitchenObject)
+    {
+        if (kitchenObject == null)
+        {
+            kitchenObject = newKitchenObject;
+        }
+        else
+        {
+            Debug.LogError("Counter already had a kitchen object!");
+        }
+    }
+
+    /// <summary>
+    /// 获取角色的物品
+    /// </summary>
+    /// <returns>角色的物品</returns>
+    public KitchenObject GetKitchenObject()
+    {
+        return kitchenObject;
+    }
+
+    /// <summary>
+    /// 清空角色物品
+    /// </summary>
+    public void ClearKitchenObject()
+    {
+        kitchenObject = null;
+    }
+
+    /// <summary>
+    /// 判断角色是否含有物品
+    /// </summary>
+    /// <returns>true表示含有物品，false表示不含有物品</returns>
+    public bool HasKitchenObject()
+    {
+        return kitchenObject != null;
     }
 }
