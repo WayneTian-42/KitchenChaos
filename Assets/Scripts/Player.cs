@@ -1,22 +1,50 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.TextCore.Text;
-using UnityEngine.Video;
 
 public class Player : MonoBehaviour
 {
+    // 单例模式，外部可访问，只有内部能修改
+    public static Player Instance { get; private set; }
+    // 事件：当前选中的计数器发生变化
+    public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
+
+    // 事件参数：新的选中计数器
+    public class OnSelectedCounterChangedEventArgs : EventArgs
+    {
+        // 当前选中的计数器
+        public ClearCounter selectedCounter;
+
+        // 构造函数
+        public OnSelectedCounterChangedEventArgs(ClearCounter _selectedCounter)
+        {
+            selectedCounter = _selectedCounter;
+        }
+    }
+
     // 角色移动速度
     [SerializeField] private float moveSpeed = 7f;
     // 输入处理
     [SerializeField] private GameInput gameInput;
     // 计数器类的图层
     [SerializeField] private LayerMask counterLayerMask;
+    // 记录选中的计数器
+    private ClearCounter selectedCounter;
     // 角色是否在移动
     private bool isWalking;
 
     // 记录上次交互方向
     private Vector3 lastInteractDir;
+
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Debug.LogError("There is more than one player!");
+        }
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -29,28 +57,11 @@ public class Player : MonoBehaviour
     /// </summary>
     /// <param name="sender">发布事件者</param>
     /// <param name="eventArgs">事件参数</param>
-    private void GameInput_OnInteractAction(object sender, System.EventArgs eventArgs)
+    private void GameInput_OnInteractAction(object sender, EventArgs eventArgs)
     {
-        Vector2 inputVector = gameInput.GetInputVectorNormalized();
-
-        // 移动方向
-        Vector3 moveDir = new Vector3(inputVector.x, 0, inputVector.y);
-
-        // 记录交互方向
-        if (moveDir != Vector3.zero)
+        if (selectedCounter != null)
         {
-            lastInteractDir = moveDir;
-        }
-
-        float interactDis = 2f;
-        // 碰撞检测，添加图层
-        if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDis, counterLayerMask))
-        {
-            // 尝试获取ClearCounter
-            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
-            {
-                clearCounter.Interact();
-            }
+            selectedCounter.Interact();
         }
     }
 
@@ -135,7 +146,7 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// 交互处理
+    /// 检测前方固定范围内是否存在可交互计数器，若存在，则获取该计数器
     /// </summary>
     private void HandleInteraction()
     {
@@ -157,8 +168,33 @@ public class Player : MonoBehaviour
             // 尝试获取ClearCounter
             if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
             {
+                // 上次选中的不是该计数器
+                if (clearCounter != selectedCounter)
+                {
+                    SetSelectedCounter(clearCounter);
+                }
                 // clearCounter.Interact();
             }
+            else // 射线击中的物体不是ClearCounter
+            {
+                SetSelectedCounter(null);
+            }
         }
+        else // 前方不存在计数器物体
+        {
+            SetSelectedCounter(null);
+        }
+        Debug.Log(selectedCounter);
+    }
+
+    /// <summary>
+    /// 更新选中的计数器并发布事件
+    /// </summary>
+    /// <param name="clearCounter">当前选中的计数器</param>
+    private void SetSelectedCounter(ClearCounter clearCounter)
+    {
+        selectedCounter = clearCounter;
+        // 通知事件订阅者，选中的计数器发生了改变
+        OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs(selectedCounter));
     }
 }
