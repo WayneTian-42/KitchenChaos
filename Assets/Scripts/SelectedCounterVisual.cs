@@ -5,8 +5,10 @@ using UnityEngine;
 
 public class SelectedCounterVisual : MonoBehaviour
 {
-    [SerializeField] private ClearCounter clearCounter;
-    [SerializeField] private GameObject visualCounter;
+    // 柜台
+    [SerializeField] private BaseCounter baseCounter;
+    // 选中柜台后的视觉效果
+    [SerializeField] private GameObject[] visualGameObjectArray;
 
     private void Start()
     {
@@ -20,7 +22,7 @@ public class SelectedCounterVisual : MonoBehaviour
     /// <param name="eventArgs">选中的计数器</param>
     private void Player_OnSelectionCounterChanged(object sender, Player.OnSelectedCounterChangedEventArgs eventArgs)
     {
-        if (clearCounter == eventArgs.selectedCounter)
+        if (baseCounter == eventArgs.selectedCounter)
         {
             ShowVisual();
         }
@@ -35,7 +37,8 @@ public class SelectedCounterVisual : MonoBehaviour
     /// </summary>
     private void ShowVisual()
     {
-        visualCounter.SetActive(true);
+        foreach (GameObject visualGameObject in visualGameObjectArray)
+            visualGameObject.SetActive(true);
     }
 
     /// <summary>
@@ -43,6 +46,7 @@ public class SelectedCounterVisual : MonoBehaviour
     /// </summary>
     private void HideVisual()
     {
-        visualCounter.SetActive(false);
+        foreach (GameObject visualGameObject in visualGameObjectArray)
+            visualGameObject.SetActive(false);
     }
 }

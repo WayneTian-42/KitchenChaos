@@ -14,10 +14,10 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public class OnSelectedCounterChangedEventArgs : EventArgs
     {
         // 当前选中的计数器
-        public ClearCounter selectedCounter;
+        public BaseCounter selectedCounter;
 
         // 构造函数
-        public OnSelectedCounterChangedEventArgs(ClearCounter _selectedCounter)
+        public OnSelectedCounterChangedEventArgs(BaseCounter _selectedCounter)
         {
             selectedCounter = _selectedCounter;
         }
@@ -32,7 +32,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     // 手持物品的位置
     [SerializeField] private Transform kitchenObjectHoldPoint;
     // 记录选中的计数器
-    private ClearCounter selectedCounter;
+    private BaseCounter selectedCounter;
     // 角色是否在移动
     private bool isWalking;
     // 记录上次交互方向
@@ -168,8 +168,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         // 碰撞检测，添加图层
         if (Physics.Raycast(transform.position, lastInteractDir, out RaycastHit raycastHit, interactDis, counterLayerMask))
         {
-            // 尝试获取ClearCounter
-            if (raycastHit.transform.TryGetComponent(out ClearCounter clearCounter))
+            // 尝试获取BaseCounter
+            if (raycastHit.transform.TryGetComponent(out BaseCounter clearCounter))
             {
                 // 上次选中的不是该计数器
                 if (clearCounter != selectedCounter)
@@ -178,7 +178,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
                 }
                 // clearCounter.Interact();
             }
-            else // 射线击中的物体不是ClearCounter
+            else // 射线击中的物体不是BaseCounter
             {
                 SetSelectedCounter(null);
             }
@@ -193,10 +193,10 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     /// <summary>
     /// 更新选中的计数器并发布事件
     /// </summary>
-    /// <param name="clearCounter">当前选中的计数器</param>
-    private void SetSelectedCounter(ClearCounter clearCounter)
+    /// <param name="baseCounter">当前选中的计数器</param>
+    private void SetSelectedCounter(BaseCounter baseCounter)
     {
-        selectedCounter = clearCounter;
+        selectedCounter = baseCounter;
         // 通知事件订阅者，选中的计数器发生了改变
         OnSelectedCounterChanged?.Invoke(this, new OnSelectedCounterChangedEventArgs(selectedCounter));
     }
@@ -222,7 +222,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         }
         else
         {
-            Debug.LogError("Counter already had a kitchen object!");
+            Debug.LogError("Player already had a kitchen object!");
         }
     }
 

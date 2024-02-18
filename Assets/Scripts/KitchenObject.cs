@@ -36,7 +36,7 @@ public class KitchenObject : MonoBehaviour
         // 如果新的父对象已经具有物品，则报错
         if (newKitchenObjectParent.HasKitchenObject())
         {
-            Debug.LogError("Counter already had a kitchen object!");
+            Debug.LogError("Parent already had a kitchen object!");
         }
 
         // 更新父对象
