@@ -20,11 +20,8 @@ public class ContainerCounter : BaseCounter, IKitchenObjectParent
         // 只有当角色物品为空时才能交互，保证最多只存在一个物品
         if (!player.HasKitchenObject())
         {
-            // 在counterTopPoint位置复制一个scriptable object出来
-            Transform kitchenObjectTransform = Instantiate(kitchenObjectSO.GetObjectPrefab(), GetKitchenObjectFollowTransform());
-
-            // 直接更新物品父对象为角色，同时实现逻辑操作以及视觉更改
-            kitchenObjectTransform.GetComponent<KitchenObject>().SetKitchenObjectParent(player);
+            // 生成物品
+            KitchenObject.SpawnKitchenObject(kitchenObjectSO, player);
 
             // 发布事件，用于播放动画
             OnPlayerGrabbedObject?.Invoke(this, EventArgs.Empty);

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class KitchenObject : MonoBehaviour
@@ -10,6 +11,21 @@ public class KitchenObject : MonoBehaviour
     // 该object所属的父对象
     // 修改该属性使得不同类都可以通过接口调用从而成为物品的父对象
     private IKitchenObjectParent kitchenObjectParent;
+
+    /// <summary>
+    /// 生成物品并设置父对象
+    /// </summary>
+    /// <param name="newKitchenObjectSO">物品对应的脚本对象</param>
+    /// <param name="kitchenObjectParent">物品父对象</param>
+    public static void SpawnKitchenObject(KitchenObjectSO newKitchenObjectSO, IKitchenObjectParent kitchenObjectParent)
+    {
+        // 创建一个物品
+        Transform kitchenObjectTransform = Instantiate(newKitchenObjectSO.GetObjectPrefab());
+        // 获取物品对象
+        KitchenObject kitchenObject = kitchenObjectTransform.GetComponent<KitchenObject>();
+        // 直接更新物品父对象
+        kitchenObject.SetKitchenObjectParent(kitchenObjectParent);
+    }
 
     /// <summary>
     /// 获取prefab对应的scriptable object
@@ -56,5 +72,15 @@ public class KitchenObject : MonoBehaviour
     public IKitchenObjectParent GetKitchenObjectParent()
     {
         return kitchenObjectParent;
+    }
+
+    /// <summary>
+    /// 销毁物品
+    /// </summary>
+    public void DestroySelf()
+    {
+        // 清除物品父对象对该物品的绑定
+        GetKitchenObjectParent().ClearKitchenObject();
+        Destroy(gameObject);
     }
 }

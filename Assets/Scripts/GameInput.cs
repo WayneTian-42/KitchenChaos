@@ -2,11 +2,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class GameInput : MonoBehaviour
 {
-    // 事件处理
-    public event EventHandler OnInteractAction;
+    // 交互事件处理
+    public event EventHandler OnInteractAction, OnInteractAlternateAction;
     // InputSystem类
     private PlayerInputActions playerInputActions;
 
@@ -19,17 +20,28 @@ public class GameInput : MonoBehaviour
 
         // 按下交互键时触发事件，会调用Interact_performed函数
         playerInputActions.Player.Interact.performed += Interact_performed;
+        // 按下切菜键时触发事件，会调用InteractAlternate_performed函数
+        playerInputActions.Player.InteractAlternate.performed += InteractAlternate_performed;
     }
 
     /// <summary>
     /// 交互事件，即玩家按下交互键时调用的函数
     /// </summary>
-    /// <param name="callbackContext"></param>
-    private void Interact_performed(UnityEngine.InputSystem.InputAction.CallbackContext callbackContext)
+    /// <param name="context"></param>
+    private void Interact_performed(InputAction.CallbackContext context)
     {
         // Debug.Log(callbackContext);
         // 存在该事件的订阅者时执行，即该事件被触发了
         OnInteractAction?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// 按下交互键2
+    /// </summary>
+    /// <param name="context"></param>
+    private void InteractAlternate_performed(InputAction.CallbackContext context)
+    {
+        OnInteractAlternateAction?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>

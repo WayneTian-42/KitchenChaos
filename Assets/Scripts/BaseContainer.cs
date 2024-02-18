@@ -14,7 +14,18 @@ public class BaseCounter : MonoBehaviour
     /// </summary>
     /// <param name="player">角色</param>
     public virtual void Interact(Player player)
-    { }
+    {
+        Debug.LogError("BaseCount.Interact()");
+    }
+
+    /// <summary>
+    /// 角色和柜台交互功能：切菜
+    /// </summary>
+    /// <param name="player">角色</param>
+    public virtual void InteractAlternate(Player player)
+    {
+        Debug.LogError("BaseCount.Interact()");
+    }
 
     /// <summary>
     /// 获取柜台顶部中心位置

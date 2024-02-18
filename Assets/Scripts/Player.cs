@@ -53,10 +53,12 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     {
         // OnInteractAction触发时，会执行GameInput_OnInteractAction函数
         gameInput.OnInteractAction += GameInput_OnInteractAction;
+        // OnInteractAlternateAction触发时，会执行GameInput_OnInteractAlternateAction函数
+        gameInput.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
     }
 
     /// <summary>
-    /// 交互函数，当按下交互键时会执行
+    /// 交互函数，当按下交互键1时会执行
     /// </summary>
     /// <param name="sender">发布事件者</param>
     /// <param name="eventArgs">事件参数</param>
@@ -65,6 +67,19 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         if (selectedCounter != null)
         {
             selectedCounter.Interact(this);
+        }
+    }
+
+    /// <summary>
+    /// 交互函数，当按下交互键2时会执行
+    /// </summary>
+    /// <param name="sender">发布事件者</param>
+    /// <param name="eventArgs">事件参数</param>
+    private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
+    {
+        if (selectedCounter != null)
+        {
+            selectedCounter.InteractAlternate(this);
         }
     }
 
