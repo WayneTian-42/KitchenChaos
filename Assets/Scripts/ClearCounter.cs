@@ -10,14 +10,20 @@ public class ClearCounter : BaseCounter, IKitchenObjectParent
     /// </summary>
     public override void Interact(Player player)
     {
-        // 只有当物品为空时才能交互，保证最多只存在一个物品
-        if (!HasKitchenObject())
+        if (HasKitchenObject() == false) // 柜台为空时
         {
             // 角色手中有物品
-            if (player.HasKitchenObject())
+            if (player.HasKitchenObject() == true)
             {
                 // 更新物品父对象为柜台
                 player.GetKitchenObject().SetKitchenObjectParent(this);       
+            }
+        }
+        else // 柜台不为空时
+        {
+            if (player.HasKitchenObject() == false) // 角色手中没有物品
+            {
+                GetKitchenObject().SetKitchenObjectParent(player);
             }
         }
     }
