@@ -23,7 +23,7 @@ public class CuttingRecipeSO : ScriptableObject
     /// 获取切片后物品
     /// </summary>
     /// <returns>切片后物品</returns>
-    public KitchenObjectSO KitchenObjectSlicesSO()
+    public KitchenObjectSO GetKitchenObjectSlicesSO()
     {
         return kitchenObjectSlicesSO;
     }
