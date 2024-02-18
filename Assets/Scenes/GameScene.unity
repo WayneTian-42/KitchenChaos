@@ -1615,6 +1615,29 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: bb0938cb07bd0d340bd94607cff9e2cd,
         type: 2}
+    - target: {fileID: 3200746388289821287, guid: 987af2388df0e1a44b43782061dd6ce6,
+        type: 3}
+      propertyPath: cuttingRecipeSOArray.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3200746388289821287, guid: 987af2388df0e1a44b43782061dd6ce6,
+        type: 3}
+      propertyPath: cuttingRecipeSOArray.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 78afa8d861de5ba44a67e0bc4f3d9d80,
+        type: 2}
+    - target: {fileID: 3200746388289821287, guid: 987af2388df0e1a44b43782061dd6ce6,
+        type: 3}
+      propertyPath: cuttingRecipeSOArray.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: 909a24feeffb62745af160bd6cf66975,
+        type: 2}
+    - target: {fileID: 3200746388289821287, guid: 987af2388df0e1a44b43782061dd6ce6,
+        type: 3}
+      propertyPath: cuttingRecipeSOArray.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: dde136edbd391ab4bb7b1c5101a90b24,
+        type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 987af2388df0e1a44b43782061dd6ce6, type: 3}
 --- !u!4 &1495289390 stripped

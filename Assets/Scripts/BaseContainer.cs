@@ -24,7 +24,8 @@ public class BaseCounter : MonoBehaviour
     /// <param name="player">角色</param>
     public virtual void InteractAlternate(Player player)
     {
-        Debug.LogError("BaseCount.Interact()");
+        Debug.Log("BaseCount.Interact()");
+        // Debug.LogError("BaseCount.Interact()");
     }
 
     /// <summary>
