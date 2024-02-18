@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class ContainerCounter : BaseCounter, IKitchenObjectParent
 {
+    // 角色拿取物品事件，用于播放动画
+    public event EventHandler OnPlayerGrabbedObject;
     // 厨房预制体scriptable object
     [SerializeField] private KitchenObjectSO kitchenObjectSO;
 
@@ -22,6 +25,9 @@ public class ContainerCounter : BaseCounter, IKitchenObjectParent
 
             // 直接更新物品父对象为角色，同时实现逻辑操作以及视觉更改
             kitchenObjectTransform.GetComponent<KitchenObject>().SetKitchenObjectParent(player);
+
+            // 发布事件，用于播放动画
+            OnPlayerGrabbedObject?.Invoke(this, EventArgs.Empty);
             
             // 获取生成物体的KitchenObject类，再获取其对应的scriptable object，得到生成物体的名字
             // Debug.Log(kitchenObjectTransform.GetComponent<KitchenObject>().GetKitchenObjectSO().GetObjectName());
