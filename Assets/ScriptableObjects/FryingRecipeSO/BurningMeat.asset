@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bdfa04d7c6a320c40bcaf5a82efb0895, type: 3}
-  m_Name: CuttingCabbage
+  m_Script: {fileID: 11500000, guid: 6178f964af6d03f478df9b6bf8beabcb, type: 3}
+  m_Name: BurningMeat
   m_EditorClassIdentifier: 
-  kitchenObjectSO: {fileID: 11400000, guid: 69cf99dc5ff7f9346aaa876f3a3a7c1d, type: 2}
-  kitchenObjectSlicesSO: {fileID: 11400000, guid: bbe574da1e5f2234b9da5301a6bd6555,
+  kitchenObjectSO: {fileID: 11400000, guid: b94eb6d1535d9894ab0ff51a31728f4c, type: 2}
+  kitchenObjectFriedSO: {fileID: 11400000, guid: a0b70221e1642ef4f91900ae907b8f8f,
     type: 2}
-  maxCuttingTimes: 5
+  maxFryingTime: 5

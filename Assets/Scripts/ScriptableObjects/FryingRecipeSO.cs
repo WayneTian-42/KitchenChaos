@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu()]
-public class CuttingRecipeSO : ScriptableObject
+public class FryingRecipeSO : ScriptableObject
 {
     // 原物品
     [SerializeField] private KitchenObjectSO kitchenObjectSO;
-    // 切片后物品
-    [SerializeField] private KitchenObjectSO kitchenObjectSlicesSO;
-    // 需要切割的次数
-    [SerializeField] private int maxCuttingTimes;
+    // 煎炸后物品
+    [SerializeField] private KitchenObjectSO kitchenObjectFriedSO;
+    // 需要煎炸的时间
+    [SerializeField] private float maxFryingTime;
 
     /// <summary>
     /// 获取原物品
@@ -22,20 +22,20 @@ public class CuttingRecipeSO : ScriptableObject
     }
 
     /// <summary>
-    /// 获取切片后物品
+    /// 获取煎炸后物品
     /// </summary>
-    /// <returns>切片后物品</returns>
+    /// <returns>煎炸后物品</returns>
     public KitchenObjectSO GetKitchenObjectSlicesSO()
     {
-        return kitchenObjectSlicesSO;
+        return kitchenObjectFriedSO;
     }
 
     /// <summary>
-    /// 获取物品需要切割的最大次数
+    /// 获取物品需要煎炸的最大时间
     /// </summary>
-    /// <returns>物品要切割的最大次数</returns>
-    public int GetMaxCuttingTimes()
+    /// <returns>物品要煎炸的最大时间</returns>
+    public float GetMaxFryingTime()
     {
-        return maxCuttingTimes;
+        return maxFryingTime;
     }
 }
