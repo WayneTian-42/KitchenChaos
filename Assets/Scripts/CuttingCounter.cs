@@ -1,15 +1,46 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CuttingCounter : BaseCounter, IKitchenObjectParent
 {
+    // 事件：角色切菜
+    public event EventHandler OnCut;
+    // 事件：切割进度发生变化
+    public event EventHandler<OnCutProgressChangedEvnetArgs> OnCutProgressChanged;
+    /// <summary>
+    /// 切割事件参数：切割进度百分比
+    /// </summary>
+    public class OnCutProgressChangedEvnetArgs : EventArgs
+    {
+        // 切割进度百分比
+        public float progressNormalized;
+
+        /// <summary>
+        /// 默认构造函数
+        /// </summary>
+        public OnCutProgressChangedEvnetArgs() 
+        {
+            progressNormalized = 0f;
+        }
+        /// <summary>
+        /// 设定当前切割进度
+        /// </summary>
+        /// <param name="_progressNormalized">当前切割进度，取值[0, 1]</param>
+        public OnCutProgressChangedEvnetArgs(float _progressNormalized)
+        {
+            progressNormalized = _progressNormalized;
+        }
+    }
     // 菜单，可以查询物品被切片后的状态
     [SerializeField] private CuttingRecipeSO[] cuttingRecipeSOArray;
-    // 切片后状态
-    private KitchenObjectSO cutKitchenObjectSO;
-    // 哈希表，存储物品以及切片后物品
+    // 当前物品对应的切割菜谱
+    private CuttingRecipeSO cuttingRecipeSO;
+    // 哈希表，存储物品以及对应的菜谱
     private Hashtable cuttingRecipeSOHT;
+    // 当前切割次数
+    private int cuttingTimes;
 
     private void Awake()
     {
@@ -17,7 +48,7 @@ public class CuttingCounter : BaseCounter, IKitchenObjectParent
         cuttingRecipeSOHT = new Hashtable();
         foreach (CuttingRecipeSO cuttingRecipeSO in cuttingRecipeSOArray)
         {
-            cuttingRecipeSOHT.Add(cuttingRecipeSO.GetKitchenObjectSO(), cuttingRecipeSO.GetKitchenObjectSlicesSO());
+            cuttingRecipeSOHT.Add(cuttingRecipeSO.GetKitchenObjectSO(), cuttingRecipeSO);
         }
     }
 
@@ -32,13 +63,17 @@ public class CuttingCounter : BaseCounter, IKitchenObjectParent
             if (player.HasKitchenObject() == true)
             {
                 // // 查询角色手中物品是否能够被切片
-                cutKitchenObjectSO = (KitchenObjectSO)cuttingRecipeSOHT[player.GetKitchenObject().GetKitchenObjectSO()];
+                cuttingRecipeSO = (CuttingRecipeSO)cuttingRecipeSOHT[player.GetKitchenObject().GetKitchenObjectSO()];
                 // cutKitchenObjectSO = GetCutKitchenObjectSOForKitchenObject(player.GetKitchenObject().GetKitchenObjectSO());
                 // 物品能被切片时才可以放下
                 if (cuttingRecipeSOHT.ContainsKey(player.GetKitchenObject().GetKitchenObjectSO()))
                 {
                     // 更新物品父对象为柜台
                     player.GetKitchenObject().SetKitchenObjectParent(this);
+                    // 重置切割次数
+                    cuttingTimes = 0;
+                    // 清空进度条
+                    OnCutProgressChanged?.Invoke(this, new OnCutProgressChangedEvnetArgs());
                 }
             }
         }
@@ -56,16 +91,24 @@ public class CuttingCounter : BaseCounter, IKitchenObjectParent
     /// </summary>
     public override void InteractAlternate(Player player)
     {
-        if (HasKitchenObject() == true && cutKitchenObjectSO) // 柜台不为空且可以切片时
+        if (HasKitchenObject() == true && cuttingRecipeSO != null) // 柜台不为空且可以切片时
         // if (HasKitchenObject() == true && cuttingRecipeSOHT.ContainsKey(GetKitchenObject().GetKitchenObjectSO()))
         {
-            // 销毁原物品
-            GetKitchenObject().DestroySelf();
-            // 生成切好后的物品
-            KitchenObject.SpawnKitchenObject(cutKitchenObjectSO, this);
-            // KitchenObject.SpawnKitchenObject((KitchenObjectSO)cuttingRecipeSOHT[GetKitchenObject().GetKitchenObjectSO()], this);
-            // 物品切过一次后不能再切片
-            cutKitchenObjectSO = null;
+            ++cuttingTimes;
+            // 更新动画
+            OnCutProgressChanged?.Invoke(this, new OnCutProgressChangedEvnetArgs((float)cuttingTimes / cuttingRecipeSO.GetMaxCuttingTimes()));
+            // 切菜动画
+            OnCut?.Invoke(this, EventArgs.Empty);
+            if (cuttingTimes >= cuttingRecipeSO.GetMaxCuttingTimes()) // 切割完成后
+            {
+                // 销毁原物品
+                GetKitchenObject().DestroySelf();
+                // 生成切好后的物品
+                KitchenObject.SpawnKitchenObject(cuttingRecipeSO.GetKitchenObjectSlicesSO(), this);
+                // KitchenObject.SpawnKitchenObject((KitchenObjectSO)cuttingRecipeSOHT[GetKitchenObject().GetKitchenObjectSO()], this);
+                // 物品切过一次后不能再切片
+                cuttingRecipeSO = null;
+            }
         }
     }
 
@@ -76,10 +119,28 @@ public class CuttingCounter : BaseCounter, IKitchenObjectParent
     /// <returns>切片后物品</returns>
     private KitchenObjectSO GetCutKitchenObjectSOForKitchenObject(KitchenObjectSO kitchenObjectSO)
     {
+        CuttingRecipeSO cuttingRecipeSO = GetCuttingRecipeSOWithKitchenObject(kitchenObjectSO);
+        if (cuttingRecipeSO == null)
+        {
+            return null;
+        }
+        else
+        {
+            return cuttingRecipeSO.GetKitchenObjectSlicesSO();
+        }
+    }
+
+    /// <summary>
+    /// 根据当前物品获取对应的切割菜谱
+    /// </summary>
+    /// <param name="kitchenObjectSO">当前物品</param>
+    /// <returns>切割菜谱</returns>
+    private CuttingRecipeSO GetCuttingRecipeSOWithKitchenObject(KitchenObjectSO kitchenObjectSO)
+    {
         foreach (CuttingRecipeSO cuttingRecipeSO in cuttingRecipeSOArray)
         {
             if (cuttingRecipeSO.GetKitchenObjectSO() == kitchenObjectSO)
-                return cuttingRecipeSO.GetKitchenObjectSlicesSO();
+                return cuttingRecipeSO;
         }
         return null;
     }

@@ -26,7 +26,7 @@ public class ContainerCounterVisual : MonoBehaviour
     /// 角色拿取材料，触发事件
     /// </summary>
     /// <param name="sender">事件发布者</param>
-    /// <param name="e">时间参数</param>
+    /// <param name="e">事件参数</param>
     private void ContainerCounter_OnPlayerGrabbedObject(object sender, EventArgs e)
     {
         animator.SetTrigger(OpenClose);

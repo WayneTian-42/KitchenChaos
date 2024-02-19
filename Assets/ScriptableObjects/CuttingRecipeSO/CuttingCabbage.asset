@@ -15,3 +15,4 @@ MonoBehaviour:
   kitchenObjectSO: {fileID: 11400000, guid: 69cf99dc5ff7f9346aaa876f3a3a7c1d, type: 2}
   kitchenObjectSlicesSO: {fileID: 11400000, guid: bbe574da1e5f2234b9da5301a6bd6555,
     type: 2}
+  MaxCuttingTimes: 5

@@ -9,6 +9,8 @@ public class CuttingRecipeSO : ScriptableObject
     [SerializeField] private KitchenObjectSO kitchenObjectSO;
     // 切片后物品
     [SerializeField] private KitchenObjectSO kitchenObjectSlicesSO;
+    // 需要切割的次数
+    [SerializeField] private int MaxCuttingTimes;
 
     /// <summary>
     /// 获取原物品
@@ -26,5 +28,14 @@ public class CuttingRecipeSO : ScriptableObject
     public KitchenObjectSO GetKitchenObjectSlicesSO()
     {
         return kitchenObjectSlicesSO;
+    }
+
+    /// <summary>
+    /// 获取物品需要切割的最大次数
+    /// </summary>
+    /// <returns>物品要切割的最大次数</returns>
+    public int GetMaxCuttingTimes()
+    {
+        return MaxCuttingTimes;
     }
 }
