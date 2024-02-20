@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,38 +6,45 @@ using UnityEngine;
 public class PlateKitchenObject : KitchenObject
 {
     /// <summary>
+    /// 放入物品事件
+    /// </summary>
+    public event EventHandler<OnIngredientAddedArgs> OnIngredientAdded;
+    /// <summary>
+    /// 放入物品事件的参数
+    /// </summary>
+    public class OnIngredientAddedArgs : EventArgs
+    {
+        /// <summary>
+        /// 放入的物品
+        /// </summary>
+        public KitchenObjectSO kitchenObjectSO;
+        public OnIngredientAddedArgs(KitchenObjectSO _kitchenOjbectSO)
+        {
+            kitchenObjectSO = _kitchenOjbectSO;
+        }
+    }
+    /// <summary>
     /// 能放在盘子上的物品
     /// </summary>
     [SerializeField] private KitchenObjectSO[] validKitchenObjectSOArray;
     /// <summary>
     /// 能放在盘子上的物品，哈希表便于查询
     /// </summary>
-    private Hashtable vaildKitchenObjectSOHashTable;
+    private Dictionary<KitchenObjectSO, bool> vaildKitchenObjectSOHashTable;
     /// <summary>
     /// 盘子上已有物品
     /// </summary>
-    private Hashtable kitchenObjectSOHashTable;
+    private Dictionary<KitchenObjectSO, bool> kitchenObjectSOHashTable;
 
     private void Awake()
     {
-        vaildKitchenObjectSOHashTable = new Hashtable();
-        kitchenObjectSOHashTable = new Hashtable();
+        vaildKitchenObjectSOHashTable = new Dictionary<KitchenObjectSO, bool>();
+        kitchenObjectSOHashTable = new Dictionary<KitchenObjectSO, bool>();
         foreach (KitchenObjectSO kitchenObjectSO in validKitchenObjectSOArray)
         {
             vaildKitchenObjectSOHashTable[kitchenObjectSO] = true;
             kitchenObjectSOHashTable[kitchenObjectSO] = false;
         }
-    }
-
-    private void Update()
-    {
-        // foreach (KitchenObjectSO kitchenObjectSO in kitchenObjectSOHashTable.Keys)
-        // {
-        //     if ((bool)kitchenObjectSOHashTable[kitchenObjectSO] == true)
-        //     {
-        //         Debug.Log(kitchenObjectSO);
-        //     }
-        // }
     }
 
     /// <summary>
@@ -53,11 +61,12 @@ public class PlateKitchenObject : KitchenObject
         {
             return false;
         }
-        if ((bool)kitchenObjectSOHashTable[kitchenObjectSO] == true) // 物品已经放在盘子上
+        if (kitchenObjectSOHashTable[kitchenObjectSO] == true) // 物品已经放在盘子上
         {
             return false;
         }
         kitchenObjectSOHashTable[kitchenObjectSO] = true; // 将物品放在盘子上
+        OnIngredientAdded?.Invoke(this, new OnIngredientAddedArgs(kitchenObjectSO)); // 发布事件
         return true;
     }
 }
