@@ -126,7 +126,7 @@ public class StoveCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
 
 
     /// <summary>
-    /// 交互函数，角色可以将材料放置在炉灶台上
+    /// 交互函数，角色可以将材料放置在炉灶台上，或者从灶台上拿取物品
     /// </summary>
     public override void Interact(Player player)
     {
@@ -158,14 +158,30 @@ public class StoveCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
             if (player.HasKitchenObject() == false) // 角色手中没有物品
             {
                 GetKitchenObject().SetKitchenObjectParent(player);
-                fryingTimer = 0;
-                // 更新进度条
-                OnProgressChanged?.Invoke(this, new IHasProgressBar.OnProgressChangedEvnetArgs());
-                // 更新状态
-                objectState = State.Idle;
-                // 更改显示效果
-                OnStateChanged?.Invoke(this, new OnStateChangeArgs(objectState));
+                StopFrying();
+            }
+            else if (player.GetKitchenObject().TryGetPlateKitchenObject(out PlateKitchenObject plateKitchenObject)) // 获取盘子
+            {
+                if (plateKitchenObject.TryAddIngredient(GetKitchenObject().GetKitchenObjectSO())) // 尝试将物品放在盘子上
+                {
+                    GetKitchenObject().DestroySelf(); // 放置成功后销毁原物品
+                    StopFrying();
+                }
             }
         }
+    }
+
+    /// <summary>
+    /// 停止煎炸
+    /// </summary>
+    private void StopFrying()
+    {
+        fryingTimer = 0;
+        // 更新进度条
+        OnProgressChanged?.Invoke(this, new IHasProgressBar.OnProgressChangedEvnetArgs());
+        // 更新状态
+        objectState = State.Idle;
+        // 更改显示效果
+        OnStateChanged?.Invoke(this, new OnStateChangeArgs(objectState));
     }
 }

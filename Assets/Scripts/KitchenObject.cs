@@ -75,6 +75,28 @@ public class KitchenObject : MonoBehaviour
     }
 
     /// <summary>
+    /// 尝试获取盘子对象
+    /// </summary>
+    /// <param name="plateKitchenObject">盘子对象</param>
+    /// <returns>
+    /// true：成功获取盘子对象
+    /// false：不是盘子对象
+    /// </returns>
+    public bool TryGetPlateKitchenObject(out PlateKitchenObject plateKitchenObject)
+    {
+        if (this is PlateKitchenObject)
+        {
+            plateKitchenObject = (PlateKitchenObject)this;
+            return true;
+        }
+        else
+        {
+            plateKitchenObject = null;
+            return false;
+        }
+    }
+
+    /// <summary>
     /// 销毁物品
     /// </summary>
     public void DestroySelf()

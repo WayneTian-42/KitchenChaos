@@ -41,7 +41,7 @@ public class CuttingCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
     }
 
     /// <summary>
-    /// 交互函数，角色可以将材料放置在切割柜台上
+    /// 交互函数，角色可以将材料放置在切割柜台上，或从柜台上拿取物品
     /// </summary>
     public override void Interact(Player player)
     {
@@ -70,6 +70,13 @@ public class CuttingCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
             if (player.HasKitchenObject() == false) // 角色手中没有物品
             {
                 GetKitchenObject().SetKitchenObjectParent(player);
+            }
+            else if (player.GetKitchenObject().TryGetPlateKitchenObject(out PlateKitchenObject plateKitchenObject)) // 获取盘子
+            {
+                if (plateKitchenObject.TryAddIngredient(GetKitchenObject().GetKitchenObjectSO())) // 尝试将物品放在盘子上
+                {
+                    GetKitchenObject().DestroySelf(); // 放置成功后销毁原物品
+                }
             }
         }
     }
