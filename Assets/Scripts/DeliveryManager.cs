@@ -33,6 +33,14 @@ public class DeliveryManager : MonoBehaviour
         }
     }
     /// <summary>
+    /// 订单交付成功，用于播放音效
+    /// </summary>
+    public event EventHandler OnRecipeSuccess;
+    /// <summary>
+    /// 订单交付失败，用于播放音效
+    /// </summary>
+    public event EventHandler OnRecipeFail;
+    /// <summary>
     /// 全部菜单
     /// </summary>
     [SerializeField] private RecipeListSO recipeListSO;
@@ -107,11 +115,12 @@ public class DeliveryManager : MonoBehaviour
             --waitingRecipeSODict[recipeSO];
             // 触发事件，更新UI
             OnRecipeCompleted?.Invoke(this, new DeliveryRecipeArgs(recipeSO));
-            Debug.Log("Player delivered the correct recipe!");
+            // 播放音效
+            OnRecipeSuccess?.Invoke(this, EventArgs.Empty);
         }
         else
         {
-            Debug.Log("Player did not deliver a correct recipe!");
+            OnRecipeFail?.Invoke(this, EventArgs.Empty);
         }
     }
 

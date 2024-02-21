@@ -6,6 +6,10 @@ using UnityEngine;
 public class CuttingCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
 {
     /// <summary>
+    /// 事件：任何一个切菜台切菜
+    /// </summary>
+    public static event EventHandler OnAnyCut;
+    /// <summary>
     /// 事件：角色切菜
     /// </summary>
     public event EventHandler OnCut;
@@ -94,6 +98,8 @@ public class CuttingCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
             OnProgressChanged?.Invoke(this, new IHasProgressBar.OnProgressChangedEvnetArgs((float)cuttingTimes / cuttingRecipeSO.GetMaxCuttingTimes()));
             // 切菜动画
             OnCut?.Invoke(this, EventArgs.Empty);
+            // 切菜音效
+            OnAnyCut?.Invoke(this, EventArgs.Empty);
             if (cuttingTimes >= cuttingRecipeSO.GetMaxCuttingTimes()) // 切割完成后
             {
                 // 销毁原物品

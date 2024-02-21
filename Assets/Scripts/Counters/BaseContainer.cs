@@ -1,9 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class BaseCounter : MonoBehaviour
 {
+    /// <summary>
+    /// 事件：角色放下物品
+    /// </summary>
+    public static event EventHandler OnAnyObjectPlaced;
     // 柜台顶部中心位置
     [SerializeField] private Transform counterTopPoint;
     // 柜台的物品
@@ -46,6 +51,11 @@ public class BaseCounter : MonoBehaviour
         if (kitchenObject == null)
         {
             kitchenObject = newKitchenObject;
+            // 新物品不为空时，播放音效
+            if (newKitchenObject != null)
+            {
+                OnAnyObjectPlaced?.Invoke(this, EventArgs.Empty);
+            }
         }
         else
         {

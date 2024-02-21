@@ -5,6 +5,15 @@ using UnityEngine;
 public class DeliveryCounter : BaseCounter
 {
     /// <summary>
+    /// 单例
+    /// </summary>
+    public static DeliveryCounter Instance { get; private set; }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+    /// <summary>
     /// 放置盘子到传送台上
     /// </summary>
     /// <param name="player">角色</param>

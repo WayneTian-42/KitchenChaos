@@ -9,7 +9,6 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     public static Player Instance { get; private set; }
     // 事件：当前选中的计数器发生变化
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
-
     // 事件参数：新的选中计数器
     public class OnSelectedCounterChangedEventArgs : EventArgs
     {
@@ -22,6 +21,10 @@ public class Player : MonoBehaviour, IKitchenObjectParent
             selectedCounter = _selectedCounter;
         }
     }
+    /// <summary>
+    /// 事件：角色拿起物品
+    /// </summary>
+    public event EventHandler OnPickUpSomething;
 
     // 角色移动速度
     [SerializeField] private float moveSpeed = 7f;
@@ -234,6 +237,11 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         if (kitchenObject == null)
         {
             kitchenObject = newKitchenObject;
+            // 新物品不为空时，播放音效
+            if (newKitchenObject != null)
+            {
+                OnPickUpSomething?.Invoke(this, EventArgs.Empty);
+            }
         }
         else
         {
