@@ -36,7 +36,10 @@ public class RecipeSO : ScriptableObject, IEquatable<RecipeSO>
         Dictionary<KitchenObjectSO, int> frequency2 = GetElementFrequency(other.kitchenObjectSOList);
 
         // 比较两个字典是否相等
-        return frequency1.All(kv => frequency2.TryGetValue(kv.Key, out int value) && kv.Value == value);
+        bool equal = frequency1.All(kv => frequency2.TryGetValue(kv.Key, out int value) && kv.Value == value);
+        // 若other和自身相等，更改其名字（用于将盘中物品更名为实际菜谱）
+        other.recipeName = equal ? recipeName : other.recipeName;
+        return equal;
     }
 
     /// <summary>

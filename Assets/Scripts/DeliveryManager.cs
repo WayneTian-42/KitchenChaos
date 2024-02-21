@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,6 +9,29 @@ public class DeliveryManager : MonoBehaviour
     /// 单例模式，只有一个传送管理器
     /// </summary>
     public static DeliveryManager Instance;
+    /// <summary>
+    /// 生成订单事件
+    /// </summary>
+    public event EventHandler<DeliveryRecipeArgs> OnRecipeSpawned;
+    /// <summary>
+    /// 完成订单事件
+    /// </summary>
+    public event EventHandler<DeliveryRecipeArgs> OnRecipeCompleted;
+    /// <summary>
+    /// 订单事件参数
+    /// </summary>
+    public class DeliveryRecipeArgs : EventArgs
+    {
+        /// <summary>
+        /// 生成或完成的订单
+        /// </summary>
+        public RecipeSO recipeSO;
+
+        public DeliveryRecipeArgs(RecipeSO _recipeSO)
+        {
+            recipeSO = _recipeSO;
+        }
+    }
     /// <summary>
     /// 全部菜单
     /// </summary>
@@ -59,9 +83,10 @@ public class DeliveryManager : MonoBehaviour
             {
                 ++waitingRecipeNum;
                 // 随机生成新订单
-                RecipeSO recipeSO = recipeSOList[Random.Range(0, recipeSOList.Count)];
+                RecipeSO recipeSO = recipeSOList[UnityEngine.Random.Range(0, recipeSOList.Count)];
                 ++waitingRecipeSODict[recipeSO];
-                Debug.Log(recipeSO.recipeName);
+                // 生成UI
+                OnRecipeSpawned?.Invoke(this, new DeliveryRecipeArgs(recipeSO));
             }
         }
     }
@@ -75,10 +100,13 @@ public class DeliveryManager : MonoBehaviour
         // 获取盘子中的物品
         RecipeSO recipeSO = ScriptableObject.CreateInstance<RecipeSO>();
         recipeSO.kitchenObjectSOList = plateKitchenObject.GetKitchenObjectSOList();
-        if (waitingRecipeSODict.TryGetValue(recipeSO, out int num) && num > 0)
+        if (waitingRecipeSODict.TryGetValue(recipeSO, out int num) && num > 0) // 订单中存在该物品且数量大于0
         {
+            // 从订单中移除该菜谱
             --waitingRecipeNum;
             --waitingRecipeSODict[recipeSO];
+            // 触发事件，更新UI
+            OnRecipeCompleted?.Invoke(this, new DeliveryRecipeArgs(recipeSO));
             Debug.Log("Player delivered the correct recipe!");
         }
         else
