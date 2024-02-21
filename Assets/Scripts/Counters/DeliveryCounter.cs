@@ -14,6 +14,7 @@ public class DeliveryCounter : BaseCounter
         {
             if (player.GetKitchenObject().TryGetPlateKitchenObject(out PlateKitchenObject plateKitchenObject)) // 尝试获取角色手中盘子
             {
+                DeliveryManager.Instance.DeliverRecipe(plateKitchenObject);
                 plateKitchenObject.DestroySelf(); // 成功获取到盘子，将其销毁
             }
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PlateKitchenObject : KitchenObject
@@ -34,16 +35,16 @@ public class PlateKitchenObject : KitchenObject
     /// <summary>
     /// 盘子上已有物品
     /// </summary>
-    private Dictionary<KitchenObjectSO, bool> kitchenObjectSOHashTable;
+    private Dictionary<KitchenObjectSO, bool> kitchenObjectSODict;
 
     private void Awake()
     {
         vaildKitchenObjectSOHashTable = new Dictionary<KitchenObjectSO, bool>();
-        kitchenObjectSOHashTable = new Dictionary<KitchenObjectSO, bool>();
+        kitchenObjectSODict = new Dictionary<KitchenObjectSO, bool>();
         foreach (KitchenObjectSO kitchenObjectSO in validKitchenObjectSOArray)
         {
             vaildKitchenObjectSOHashTable[kitchenObjectSO] = true;
-            kitchenObjectSOHashTable[kitchenObjectSO] = false;
+            kitchenObjectSODict[kitchenObjectSO] = false;
         }
     }
 
@@ -61,12 +62,21 @@ public class PlateKitchenObject : KitchenObject
         {
             return false;
         }
-        if (kitchenObjectSOHashTable[kitchenObjectSO] == true) // 物品已经放在盘子上
+        if (kitchenObjectSODict[kitchenObjectSO] == true) // 物品已经放在盘子上
         {
             return false;
         }
-        kitchenObjectSOHashTable[kitchenObjectSO] = true; // 将物品放在盘子上
+        kitchenObjectSODict[kitchenObjectSO] = true; // 将物品放在盘子上
         OnIngredientAdded?.Invoke(this, new OnIngredientAddedArgs(kitchenObjectSO)); // 发布事件
         return true;
+    }
+
+    /// <summary>
+    /// 获取盘子中所有物品
+    /// </summary>
+    /// <returns>盘子中所有物品</returns>
+    public List<KitchenObjectSO> GetKitchenObjectSOList()
+    {
+        return kitchenObjectSODict.Where(key => key.Value == true).Select(pair => pair.Key).ToList();
     }
 }
