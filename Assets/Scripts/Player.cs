@@ -67,6 +67,10 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     /// <param name="eventArgs">事件参数</param>
     private void GameInput_OnInteractAction(object sender, EventArgs eventArgs)
     {
+        if (!GameManager.Instance.IsGamePlaying()) // 不在游玩状态
+        {
+            return;
+        }
         if (selectedCounter != null)
         {
             selectedCounter.Interact(this);
@@ -80,6 +84,10 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     /// <param name="eventArgs">事件参数</param>
     private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
     {
+        if (!GameManager.Instance.IsGamePlaying()) // 不在游玩状态
+        {
+            return;
+        }
         if (selectedCounter != null)
         {
             selectedCounter.InteractAlternate(this);
