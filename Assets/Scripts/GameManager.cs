@@ -43,10 +43,12 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private State gameState;
 
+    private const float MaxGamePlayingTimer = 15f;
+
     /// <summary>
     /// 等待计时器，倒计时计时器，游玩计时器
     /// </summary>
-    private float waitingToStartTimer = 1f, countdownToStartTimer = 3f, gamePlayingTimer = 10f;
+    private float waitingToStartTimer = 1f, countdownToStartTimer = 3f, gamePlayingTimer = MaxGamePlayingTimer;
 
     private void Awake()
     {
@@ -111,11 +113,32 @@ public class GameManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 游戏是否结束
+    /// </summary>
+    /// <returns>
+    /// true: 结束
+    /// false: 未结束
+    /// </returns>
+    public bool IsGameOver()
+    {
+        return gameState == State.GameOver;
+    }
+
+    /// <summary>
     /// 获取开始倒计时
     /// </summary>
     /// <returns>开始倒计时</returns>
     public float GetCountdownTimer()
     {
         return countdownToStartTimer;
+    }
+
+    /// <summary>
+    /// 获取游戏剩余时间所占比例
+    /// </summary>
+    /// <returns>游戏剩余时间所占比例/returns>
+    public float GetGamePlayingTimerNormalized()
+    {
+        return 1 - gamePlayingTimer / MaxGamePlayingTimer;
     }
 }

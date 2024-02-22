@@ -68,6 +68,10 @@ public class DeliveryManager : MonoBehaviour
     /// 订单最大数量
     /// </summary>
     private const int MaxWaitingRecipeNum = 4;
+    /// <summary>
+    /// 订单完成数量
+    /// </summary>
+    private int completedRecipeNum = 0;
 
     private void Awake()
     {
@@ -113,6 +117,8 @@ public class DeliveryManager : MonoBehaviour
             // 从订单中移除该菜谱
             --waitingRecipeNum;
             --waitingRecipeSODict[recipeSO];
+            // 完成数+1
+            ++completedRecipeNum;
             // 触发事件，更新UI
             OnRecipeCompleted?.Invoke(this, new DeliveryRecipeArgs(recipeSO));
             // 播放音效
@@ -124,4 +130,12 @@ public class DeliveryManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 获取完成订单数量
+    /// </summary>
+    /// <returns>完成的订单数量</returns>
+    public int GetCompletedRecipeNum()
+    {
+        return completedRecipeNum;
+    }
 }
