@@ -12,10 +12,21 @@ public class SoundManager : MonoBehaviour
     /// 音效片段
     /// </summary>
     [SerializeField] private AudioClipRefSO audioClipRefSO;
+    /// <summary>
+    /// 音量大小
+    /// </summary>
+    private float volume = 1f;
+    /// <summary>
+    /// 音效音量字符串常量
+    /// </summary>
+    private const string PlayerPrefsSoundEffectsVolume = "SoundEffectsVolume";
 
     private void Awake()
     {
         Instance = this;
+
+        // 获取存储的音量大小
+        volume = PlayerPrefs.GetFloat(PlayerPrefsSoundEffectsVolume, volume);
     }
 
     private void Start()
@@ -27,6 +38,30 @@ public class SoundManager : MonoBehaviour
         Player.Instance.OnPickUpSomething += Player_OnPickUpSomething;
         BaseCounter.OnAnyObjectPlaced += BaseCounter_OnAnyObjectPlaced;
         TrashCounter.OnAnyObjectTrashed += TrashCounter_OnAnyObjectTrashed;
+    }
+
+    /// <summary>
+    /// 循环增加音量，保证音量始终在[0, 1]之间
+    /// </summary>
+    public void AddVolume()
+    {
+        volume += 0.1f;
+        if (volume > 1.09f)
+        {
+            volume = 0f;
+        }
+
+        // 存储音乐音量
+        PlayerPrefs.SetFloat(PlayerPrefsSoundEffectsVolume, volume);
+        PlayerPrefs.Save();
+    }
+    /// <summary>
+    /// 获取音效音量大小
+    /// </summary>
+    /// <returns>音效音量</returns>
+    public float GetVolume()
+    {
+        return volume;
     }
 
     /// <summary>
@@ -118,9 +153,9 @@ public class SoundManager : MonoBehaviour
     /// </summary>
     /// <param name="audioClipArray">音效</param>
     /// <param name="position">播放音效位置</param>
-    /// <param name="volume">音效音量</param>
-    private void PlaySound(AudioClip audioClip, Vector3 position, float volume = 1f)
+    /// <param name="volumeMultiplyer">音效音量</param>
+    private void PlaySound(AudioClip audioClip, Vector3 position, float volumeMultiplyer = 1f)
     {
-        AudioSource.PlayClipAtPoint(audioClip, position, volume);
+        AudioSource.PlayClipAtPoint(audioClip, position, volumeMultiplyer * volume);
     }
 }

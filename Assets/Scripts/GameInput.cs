@@ -44,6 +44,21 @@ public class GameInput : MonoBehaviour
     }
 
     /// <summary>
+    /// 销毁实例时执行，取消事件订阅并释放内存
+    /// </summary>
+    void OnDestroy()
+    {
+        // 不取消事件订阅，直接销毁实例似乎也可以
+        // 取消事件订阅
+        playerInputActions.Player.Interact.performed -= Interact_performed;
+        playerInputActions.Player.InteractAlternate.performed -= InteractAlternate_performed;
+        playerInputActions.Player.Pause.performed -= Pause_performed;
+
+        // 释放内存
+        playerInputActions.Dispose();
+    }
+
+    /// <summary>
     /// 暂停事件，按下暂停键后调用的函数
     /// </summary>
     /// <param name="context"></param>

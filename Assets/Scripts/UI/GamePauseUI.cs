@@ -11,6 +11,10 @@ public class GamePauseUI : MonoBehaviour
     /// </summary>
     [SerializeField] private Button resumeButton;
     /// <summary>
+    /// 选项按钮
+    /// </summary>
+    [SerializeField] private Button optionsButton;
+    /// <summary>
     /// 主菜单按钮
     /// </summary>
     [SerializeField] private Button mainMenuButton;
@@ -20,6 +24,9 @@ public class GamePauseUI : MonoBehaviour
         resumeButton.onClick.AddListener(() => 
         {
             GameManager.Instance.TogglePauseGame();
+        });
+        optionsButton.onClick.AddListener(() => {
+            OptionsUI.Instance.Show();
         });
         mainMenuButton.onClick.AddListener(() => 
         {
