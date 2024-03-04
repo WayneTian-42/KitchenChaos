@@ -8,7 +8,7 @@ public class GameManager : MonoBehaviour
     /// <summary>
     /// 全局单例
     /// </summary>
-    public static GameManager Instance {get; private set; }
+    public static GameManager Instance { get; private set; }
 
     /// <summary>
     /// 游戏状态
@@ -37,22 +37,40 @@ public class GameManager : MonoBehaviour
     /// 事件：游戏状态发生改变
     /// </summary>
     public event EventHandler OnStateChanged;
-
+    /// <summary>
+    /// 事件：暂停游戏
+    /// </summary>
+    public event EventHandler OnGamePaused;
+    /// <summary>
+    /// 事件：继续游戏
+    /// </summary>
+    public event EventHandler OnGameResumed;
     /// <summary>
     /// 游戏状态
     /// </summary>
     private State gameState;
-
+    /// <summary>
+    /// 关卡最大游戏时长
+    /// </summary>
     private const float MaxGamePlayingTimer = 15f;
-
     /// <summary>
     /// 等待计时器，倒计时计时器，游玩计时器
     /// </summary>
     private float waitingToStartTimer = 1f, countdownToStartTimer = 3f, gamePlayingTimer = MaxGamePlayingTimer;
 
+    /// <summary>
+    /// 游戏暂停标识
+    /// </summary>
+    private bool isPauseGame = false;
+
     private void Awake()
     {
         Instance = this;
+    }
+
+    private void Start()
+    {
+        GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
     }
 
     private void Update()
@@ -85,6 +103,36 @@ public class GameManager : MonoBehaviour
                 break;
             case State.GameOver:
                 break;
+        }
+    }
+
+    /// <summary>
+    /// 暂停事件
+    /// </summary>
+    /// <param name="sender">事件发布者：游戏输入类</param>
+    /// <param name="e">事件参数：空</param>
+    private void GameInput_OnPauseAction(object sender, EventArgs e)
+    {
+        TogglePauseGame();
+    }
+
+    /// <summary>
+    /// 切换游戏状态：暂停或继续
+    /// </summary>
+    public void TogglePauseGame()
+    {
+        isPauseGame = !isPauseGame;
+        if (isPauseGame)
+        {
+            Time.timeScale = 0f;
+
+            OnGamePaused?.Invoke(this, EventArgs.Empty);
+        }
+        else
+        {
+            Time.timeScale = 1f;
+
+            OnGameResumed?.Invoke(this, EventArgs.Empty);
         }
     }
 

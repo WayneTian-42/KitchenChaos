@@ -6,14 +6,31 @@ using UnityEngine.InputSystem;
 
 public class GameInput : MonoBehaviour
 {
-    // 交互事件处理
-    public event EventHandler OnInteractAction, OnInteractAlternateAction;
-    // InputSystem类
+    /// <summary>
+    /// 单例模式
+    /// </summary>
+    public static GameInput Instance { get; private set; }
+    /// <summary>
+    /// 交互事件1：放下拿起物品
+    /// </summary>
+    public event EventHandler OnInteractAction;
+    /// <summary>
+    /// 交互事件2：切菜
+    /// </summary>
+    public event EventHandler OnInteractAlternateAction;
+    /// <summary>
+    /// 暂停事件
+    /// </summary>
+    public event EventHandler OnPauseAction;
+    /// <summary>
+    /// 输入按键类
+    /// </summary>
     private PlayerInputActions playerInputActions;
 
     // 输入控制
     private void Awake()
     {
+        Instance = this;
         // 激活输入
         playerInputActions = new PlayerInputActions();
         playerInputActions.Player.Enable();
@@ -22,6 +39,17 @@ public class GameInput : MonoBehaviour
         playerInputActions.Player.Interact.performed += Interact_performed;
         // 按下切菜键时触发事件，会调用InteractAlternate_performed函数
         playerInputActions.Player.InteractAlternate.performed += InteractAlternate_performed;
+        // 按下暂停键时触发事件
+        playerInputActions.Player.Pause.performed += Pause_performed;
+    }
+
+    /// <summary>
+    /// 暂停事件，按下暂停键后调用的函数
+    /// </summary>
+    /// <param name="context"></param>
+    private void Pause_performed(InputAction.CallbackContext context)
+    {
+        OnPauseAction?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>

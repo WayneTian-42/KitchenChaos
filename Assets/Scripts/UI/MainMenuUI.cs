@@ -24,5 +24,8 @@ public class MainMenuUI : MonoBehaviour
         {
             Application.Quit();
         });
+
+        // 重置时间速度
+        Time.timeScale = 1f;
     }
 }

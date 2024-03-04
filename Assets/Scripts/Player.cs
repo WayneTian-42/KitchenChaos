@@ -28,8 +28,6 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     // 角色移动速度
     [SerializeField] private float moveSpeed = 7f;
-    // 输入处理
-    [SerializeField] private GameInput gameInput;
     // 计数器类的图层
     [SerializeField] private LayerMask counterLayerMask;
     // 手持物品的位置
@@ -55,9 +53,9 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private void Start()
     {
         // OnInteractAction触发时，会执行GameInput_OnInteractAction函数
-        gameInput.OnInteractAction += GameInput_OnInteractAction;
+        GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
         // OnInteractAlternateAction触发时，会执行GameInput_OnInteractAlternateAction函数
-        gameInput.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+        GameInput.Instance.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
     }
 
     /// <summary>
@@ -115,7 +113,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     /// </summary>
     private void HandleMovement()
     {
-        Vector2 inputVector = gameInput.GetInputVectorNormalized();
+        Vector2 inputVector = GameInput.Instance.GetInputVectorNormalized();
 
         // 移动方向
         Vector3 moveDir = new Vector3(inputVector.x, 0, inputVector.y);
@@ -179,7 +177,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     /// </summary>
     private void HandleInteraction()
     {
-        Vector2 inputVector = gameInput.GetInputVectorNormalized();
+        Vector2 inputVector = GameInput.Instance.GetInputVectorNormalized();
 
         // 移动方向
         Vector3 moveDir = new Vector3(inputVector.x, 0, inputVector.y);
