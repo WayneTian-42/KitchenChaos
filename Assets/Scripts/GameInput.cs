@@ -23,9 +23,47 @@ public class GameInput : MonoBehaviour
     /// </summary>
     public event EventHandler OnPauseAction;
     /// <summary>
+    /// 操作
+    /// </summary>
+    public enum Binding
+    {
+        /// <summary>
+        /// 向上移动
+        /// </summary>
+        MoveUp,
+        /// <summary>
+        /// 向下移动
+        /// </summary>
+        MoveDown,
+        /// <summary>
+        /// 向左移动
+        /// </summary>
+        MoveLeft,
+        /// <summary>
+        /// 向右移动
+        /// </summary>
+        MoveRight,
+        /// <summary>
+        /// 放下/拿起物品
+        /// </summary>
+        Interact,
+        /// <summary>
+        /// 切菜
+        /// </summary>
+        InteractAlternate,
+        /// <summary>
+        /// 暂停
+        /// </summary>
+        Pause
+    };
+    /// <summary>
     /// 输入按键类
     /// </summary>
     private PlayerInputActions playerInputActions;
+    /// <summary>
+    /// 输入绑定，用于持久化存储
+    /// </summary>
+    private const string PlayerPrefsBindings = "InputBindings";
 
     // 输入控制
     private void Awake()
@@ -33,6 +71,11 @@ public class GameInput : MonoBehaviour
         Instance = this;
         // 激活输入
         playerInputActions = new PlayerInputActions();
+        // 读取按键
+        if (PlayerPrefs.HasKey(PlayerPrefsBindings))
+        {
+            playerInputActions.LoadBindingOverridesFromJson(PlayerPrefs.GetString(PlayerPrefsBindings));
+        }
         playerInputActions.Player.Enable();
 
         // 按下交互键时触发事件，会调用Interact_performed函数
@@ -46,7 +89,7 @@ public class GameInput : MonoBehaviour
     /// <summary>
     /// 销毁实例时执行，取消事件订阅并释放内存
     /// </summary>
-    void OnDestroy()
+    private void OnDestroy()
     {
         // 不取消事件订阅，直接销毁实例似乎也可以
         // 取消事件订阅
@@ -100,5 +143,87 @@ public class GameInput : MonoBehaviour
         inputVector = inputVector.normalized;
 
         return inputVector;
+    }
+
+    /// <summary>
+    /// 根据操作以字符串形式返回绑定的按键
+    /// </summary>
+    /// <param name="binding">操作类型</param>
+    /// <returns>绑定的按键</returns>
+    public string GetBindingText(Binding binding)
+    {
+        switch (binding)
+        {
+            case Binding.MoveUp:
+                return playerInputActions.Player.Move.bindings[1].ToDisplayString();
+            case Binding.MoveDown:
+                return playerInputActions.Player.Move.bindings[2].ToDisplayString();
+            case Binding.MoveLeft:
+                return playerInputActions.Player.Move.bindings[3].ToDisplayString();
+            case Binding.MoveRight:
+                return playerInputActions.Player.Move.bindings[4].ToDisplayString();
+            case Binding.Interact:
+                return playerInputActions.Player.Interact.bindings[0].ToDisplayString();
+            case Binding.InteractAlternate:
+                return playerInputActions.Player.InteractAlternate.bindings[0].ToDisplayString();
+            case Binding.Pause:
+                return playerInputActions.Player.Pause.bindings[0].ToDisplayString();
+            default:
+                return "";
+        }
+    }
+
+    /// <summary>
+    /// 重新绑定按键
+    /// </summary>
+    /// <param name="binding">要绑定的操作</param>
+    /// <param name="onActionRebind">绑定完成后执行的操作</param>
+    public void Rebinding(Binding binding, Action onActionRebind)
+    {
+        // 操作
+        InputAction inputAction;
+        // 绑定数组的序号
+        int bindingIndex = 0;
+        switch (binding)
+        {
+            case Binding.MoveUp:
+                inputAction = playerInputActions.Player.Move;
+                bindingIndex = 1;
+                break;
+            case Binding.MoveDown:
+                inputAction = playerInputActions.Player.Move;
+                bindingIndex = 2;
+                break;
+            case Binding.MoveLeft:
+                inputAction = playerInputActions.Player.Move;
+                bindingIndex = 3;
+                break;
+            case Binding.MoveRight:
+                inputAction = playerInputActions.Player.Move;
+                bindingIndex = 3;
+                break;
+            case Binding.Interact:
+                inputAction = playerInputActions.Player.Interact;
+                break;
+            case Binding.InteractAlternate:
+                inputAction = playerInputActions.Player.InteractAlternate;
+                break;
+            case Binding.Pause:
+                inputAction = playerInputActions.Player.Pause;
+                break;
+            default:
+                inputAction = null;
+                break;
+        }
+        playerInputActions.Player.Disable(); // 禁用按键
+        inputAction.PerformInteractiveRebinding(bindingIndex).OnComplete(callback =>
+        {
+            // Debug.Log(callback.action.bindings[1].path); // 输出操作原本绑定的按键
+            // Debug.Log(callback.action.bindings[1].overridePath); // 输出操作由玩家重新绑定后的按键
+            callback.Dispose(); // 释放内存
+            playerInputActions.Player.Enable(); // 启用按键
+            onActionRebind();
+            PlayerPrefs.SetString(PlayerPrefsBindings, playerInputActions.SaveBindingOverridesAsJson()); // 持久化存储
+        }).Start();
     }
 }
