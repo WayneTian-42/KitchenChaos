@@ -7,6 +7,7 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 {
     // 单例模式，外部可访问，只有内部能修改
     public static Player Instance { get; private set; }
+
     // 事件：当前选中的计数器发生变化
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
     // 事件参数：新的选中计数器
@@ -40,6 +41,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent
     private Vector3 lastInteractDir;
     // 手持物品
     private KitchenObject kitchenObject;
+    // 游戏是否暂停
+    private bool isGamePause;
 
     private void Awake()
     {
@@ -56,6 +59,38 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
         // OnInteractAlternateAction触发时，会执行GameInput_OnInteractAlternateAction函数
         GameInput.Instance.OnInteractAlternateAction += GameInput_OnInteractAlternateAction;
+
+        GameManager.Instance.OnGamePaused += GameManager_OnGamePaused;
+        GameManager.Instance.OnGameResumed += GameManager_OnGameResumed;
+    }
+
+    private void Update()
+    {
+        if (!isGamePause)
+        {
+            HandleMovement();
+            HandleInteraction();
+        }
+    }
+
+    /// <summary>
+    /// 游戏暂停
+    /// </summary>
+    /// <param name="sender">事件发布者：GameManager</param>
+    /// <param name="e">事件参数：空</param>
+    private void GameManager_OnGamePaused(object sender, EventArgs e)
+    {
+        isGamePause = true;
+    }
+
+    /// <summary>
+    /// 游戏继续
+    /// </summary>
+    /// <param name="sender">事件发布者：GameManager</param>
+    /// <param name="e">事件参数：空</param>
+    private void GameManager_OnGameResumed(object sender, EventArgs e)
+    {
+        isGamePause = false;
     }
 
     /// <summary>
@@ -92,12 +127,6 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         }
     }
 
-    private void Update()
-    {
-        HandleMovement();
-        HandleInteraction();
-    }
-
     /// <summary>
     /// 角色是否在移动
     /// </summary>
@@ -130,28 +159,31 @@ public class Player : MonoBehaviour, IKitchenObjectParent
         if (!canMove)
         {
             // 尝试只在x轴移动
-            Vector3 moveDirX = new Vector3(moveDir.x, 0, 0).normalized; // 归一化使得移动速度相同，但是个人觉得不归一化也可以
-            canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * palyerHeight, playerRadius, moveDirX, moveDistance);
+            Vector3 moveDirX = new Vector3(moveDir.x, 0, 0);
+            // Debug.Log(moveDir);
+            // 消除手柄在x轴上的微小扰动
+            canMove = MathF.Abs(moveDirX.x) > 0.5f && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * palyerHeight, playerRadius, moveDirX, moveDistance);
 
-            if (canMove) // 当x轴分量为0时，canMove也会为true
+            if (canMove)
             {
                 moveDir = moveDirX;
-                // Debug.Log("X");
+                // Debug.Log(moveDir);
             }
             else
             {
                 // 尝试在z轴移动
-                Vector3 moveDirZ = new Vector3(0, 0, moveDir.z).normalized; // 归一化使得移动速度相同，但是个人觉得不归一化也可以
-                canMove = !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * palyerHeight, playerRadius, moveDirZ, moveDistance);
+                Vector3 moveDirZ = new Vector3(0, 0, moveDir.z);
+                // 消除手柄在z轴上的微小扰动
+                canMove = MathF.Abs(moveDirZ.z) > 0.5f && !Physics.CapsuleCast(transform.position, transform.position + Vector3.up * palyerHeight, playerRadius, moveDirZ, moveDistance);
 
-                if (canMove) // 当z轴分量为0时，canMove也会为true
+                if (canMove)
                 {
                     moveDir = moveDirZ;
                     // Debug.Log("Z");
                 }
             }
-
         }
+        moveDir = moveDir.normalized; // 归一化使得移动速度相同，但是个人觉得不归一化也可以
 
         // 没有物体时，才可以移动
         if (canMove)

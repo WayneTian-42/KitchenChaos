@@ -89,9 +89,35 @@ public class OptionsUI : MonoBehaviour
     /// </summary>
     [SerializeField] private TextMeshProUGUI pauseText;
     /// <summary>
+    /// 手柄拿取/放下按钮
+    /// </summary>
+    [SerializeField] private Button gamepadInteractButton;
+    /// <summary>
+    /// 手柄拿取/放下按钮文本
+    /// </summary>
+    [SerializeField] private TextMeshProUGUI gamepadInteractText;
+    /// <summary>
+    /// 手柄切菜按钮
+    /// </summary>
+    [SerializeField] private Button gamepadInteractAlternateButton;
+    /// <summary>
+    /// 手柄切菜按钮文本
+    /// </summary>
+    [SerializeField] private TextMeshProUGUI gamepadInteractAlternateText;
+    /// <summary>
+    /// 手柄暂停按钮
+    /// </summary>
+    [SerializeField] private Button gamepadPauseButton;
+    /// <summary>
+    /// 手柄暂停按钮文本
+    /// </summary>
+    [SerializeField] private TextMeshProUGUI gamepadPauseText;
+    /// <summary>
     /// 绑定按键UI
     /// </summary>
     [SerializeField] private Transform pressToRebindKeyUI;
+
+    private Action onCloseButtonAction;
 
     private void Awake()
     {
@@ -111,6 +137,7 @@ public class OptionsUI : MonoBehaviour
         closeButton.onClick.AddListener(() =>
         {
             Hide();
+            onCloseButtonAction();
         });
 
         // 重新绑定操作
@@ -142,6 +169,18 @@ public class OptionsUI : MonoBehaviour
         {
             RebindAction(GameInput.Binding.Pause);
         });
+        gamepadInteractButton.onClick.AddListener(() =>
+        {
+            RebindAction(GameInput.Binding.GamepadInteract);
+        });
+        gamepadInteractAlternateButton.onClick.AddListener(() =>
+        {
+            RebindAction(GameInput.Binding.GamepadInteractAlternate);
+        });
+        gamepadPauseButton.onClick.AddListener(() =>
+        {
+            RebindAction(GameInput.Binding.GamepadPause);
+        });
     }
 
     private void Start()
@@ -159,9 +198,13 @@ public class OptionsUI : MonoBehaviour
     /// <summary>
     /// 展示UI
     /// </summary>
-    public void Show()
+    /// <param name="action">关闭UI时执行的函数</param>
+    public void Show(Action action)
     {
+        onCloseButtonAction = action;
         gameObject.SetActive(true);
+
+        soundEffectsButton.Select();
     }
 
     /// <summary>
@@ -212,6 +255,9 @@ public class OptionsUI : MonoBehaviour
         interactText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Interact);
         interactAlternateText.text = GameInput.Instance.GetBindingText(GameInput.Binding.InteractAlternate);
         pauseText.text = GameInput.Instance.GetBindingText(GameInput.Binding.Pause);
+        gamepadInteractText.text = GameInput.Instance.GetBindingText(GameInput.Binding.GamepadInteract);
+        gamepadInteractAlternateText.text = GameInput.Instance.GetBindingText(GameInput.Binding.GamepadInteractAlternate);
+        gamepadPauseText.text = GameInput.Instance.GetBindingText(GameInput.Binding.GamepadPause);
     }
 
     /// <summary>
