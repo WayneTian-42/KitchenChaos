@@ -54,9 +54,9 @@ public class GameManager : MonoBehaviour
     /// </summary>
     private const float MaxGamePlayingTimer = 15f;
     /// <summary>
-    /// 等待计时器，倒计时计时器，游玩计时器
+    /// 倒计时计时器，游玩计时器
     /// </summary>
-    private float waitingToStartTimer = 1f, countdownToStartTimer = 3f, gamePlayingTimer = MaxGamePlayingTimer;
+    private float countdownToStartTimer = 3f, gamePlayingTimer = MaxGamePlayingTimer;
 
     /// <summary>
     /// 游戏暂停标识
@@ -71,6 +71,22 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         GameInput.Instance.OnPauseAction += GameInput_OnPauseAction;
+        GameInput.Instance.OnInteractAction += GameInput_OnInteractAction;
+    }
+
+    /// <summary>
+    /// 准备状态时按下交互键，进入倒计时状态
+    /// </summary>
+    /// <param name="sender">事件发布者：GameInput</param>
+    /// <param name="e">事件参数：空</param>
+    private void GameInput_OnInteractAction(object sender, EventArgs e)
+    {
+        if (gameState == State.WaitingToStart)
+        {
+            gameState = State.CountdownToStart;
+
+            OnStateChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 
     private void Update()
@@ -78,12 +94,6 @@ public class GameManager : MonoBehaviour
         switch (gameState)
         {
             case State.WaitingToStart:
-                waitingToStartTimer -= Time.deltaTime;
-                if (waitingToStartTimer <= 0f)
-                {
-                    gameState = State.CountdownToStart;
-                    OnStateChanged?.Invoke(this, EventArgs.Empty);
-                }
                 break;
             case State.CountdownToStart:
                 countdownToStartTimer -= Time.deltaTime;

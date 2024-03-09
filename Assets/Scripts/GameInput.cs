@@ -23,6 +23,10 @@ public class GameInput : MonoBehaviour
     /// </summary>
     public event EventHandler OnPauseAction;
     /// <summary>
+    /// 重新绑定按键
+    /// </summary>
+    public event EventHandler OnBindingRebind;
+    /// <summary>
     /// 操作
     /// </summary>
     public enum Binding
@@ -254,6 +258,7 @@ public class GameInput : MonoBehaviour
         {
             // Debug.Log(callback.action.bindings[1].path); // 输出操作原本绑定的按键
             // Debug.Log(callback.action.bindings[1].overridePath); // 输出操作由玩家重新绑定后的按键
+            OnBindingRebind?.Invoke(this, EventArgs.Empty);
             callback.Dispose(); // 释放内存
             playerInputActions.Player.Enable(); // 启用按键
             onActionRebind();

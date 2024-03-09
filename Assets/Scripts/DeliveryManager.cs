@@ -53,13 +53,13 @@ public class DeliveryManager : MonoBehaviour
     /// </summary>
     private List<RecipeSO> recipeSOList;
     /// <summary>
-    /// 订单生成计时器
-    /// </summary>
-    private float spawnRecipeTimer = 4f;
-    /// <summary>
     /// 生成新订单所需时间
     /// </summary>
     private const float MaxSpawnRecipeTimer = 4f;
+    /// <summary>
+    /// 订单生成计时器
+    /// </summary>
+    private float spawnRecipeTimer = MaxSpawnRecipeTimer;
     /// <summary>
     /// 当前订单数量
     /// </summary>
@@ -87,6 +87,10 @@ public class DeliveryManager : MonoBehaviour
 
     private void Update()
     {
+        if (!GameManager.Instance.IsGamePlaying())
+        {
+            return;
+        }
         spawnRecipeTimer += Time.deltaTime;
         if (spawnRecipeTimer >= MaxSpawnRecipeTimer) // 计时器大于生成订单时间，生成新订单
         {

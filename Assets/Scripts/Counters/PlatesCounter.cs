@@ -33,6 +33,10 @@ public class PlatesCounter : BaseCounter
 
     private void Update()
     {
+        if (!GameManager.Instance.IsGamePlaying())
+        {
+            return;
+        }
         if (spawningPlateAccount >= MaxSpawningPlateAccount) // 盘子数量达到最大
         {
             return;
