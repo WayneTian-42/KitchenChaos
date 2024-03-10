@@ -15,4 +15,4 @@ MonoBehaviour:
   kitchenObjectSO: {fileID: 11400000, guid: e8e147c825853e2448bfb60240c82941, type: 2}
   kitchenObjectFriedSO: {fileID: 11400000, guid: b94eb6d1535d9894ab0ff51a31728f4c,
     type: 2}
-  maxFryingTime: 3
+  maxFryingTime: 5
