@@ -10,6 +10,23 @@ public class GameStartCountdownUI : MonoBehaviour
     /// 倒计时UI文本
     /// </summary>
     [SerializeField] private TextMeshProUGUI countdownText;
+    /// <summary>
+    /// 倒计时动画控件
+    /// </summary>
+    private Animator animator;
+    /// <summary>
+    /// 动画触发器
+    /// </summary>
+    private const string NumberPopup = "NumberPopup";
+    /// <summary>
+    /// 上一秒的数字，用于更新动画
+    /// </summary>
+    private int previousNumber = 0;
+
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
 
     private void Start()
     {
@@ -19,8 +36,18 @@ public class GameStartCountdownUI : MonoBehaviour
 
     private void Update()
     {
+        int currentNumber = Mathf.CeilToInt(GameManager.Instance.GetCountdownTimer());
         // 更改文本
-        countdownText.text = Mathf.CeilToInt(GameManager.Instance.GetCountdownTimer()).ToString();
+        countdownText.text = currentNumber.ToString();
+        // 数字不同时，触发动画
+        if (currentNumber != previousNumber)
+        {
+            previousNumber = currentNumber;
+            // 触发动画
+            animator.SetTrigger(NumberPopup);
+            // 播放音效
+            SoundManager.Instance.CountDownSound();
+        }
     }
 
     /// <summary>

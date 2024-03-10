@@ -75,6 +75,15 @@ public class SoundManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 播放倒计时音效
+    /// </summary>
+    /// <param name="volume">音效音量</param>
+    public void CountDownSound(float volume = 1f)
+    {
+        PlaySound(audioClipRefSO.warning, Vector3.zero, volume);
+    }
+
+    /// <summary>
     /// 播放订单交付成功音效
     /// </summary>
     /// <param name="sender">事件发布者：交付管理类</param>
