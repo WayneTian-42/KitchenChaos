@@ -22,7 +22,7 @@ public class StoveCounterVisual : MonoBehaviour
     private void StoveCounter_OnStateChanged(object sender, StoveCounter.OnStateChangeArgs e)
     {
         // 当煎炸状态时显示特效
-        bool showVisual = (e.state == StoveCounter.State.Frying || e.state == StoveCounter.State.Fried);
+        bool showVisual = e.state == StoveCounter.State.Frying || e.state == StoveCounter.State.Fried;
         stoveOnCounter.SetActive(showVisual);
         particleGameOjbect.SetActive(showVisual);
     }

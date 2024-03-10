@@ -75,12 +75,13 @@ public class SoundManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 播放倒计时音效
+    /// 播放警告音效
     /// </summary>
+    /// <param name="poisiton">声音播放位置</param>
     /// <param name="volume">音效音量</param>
-    public void CountDownSound(float volume = 1f)
+    public void PlayWarningSound(Vector3 position, float volume = 1f)
     {
-        PlaySound(audioClipRefSO.warning, Vector3.zero, volume);
+        PlaySound(audioClipRefSO.warning, position, volume);
     }
 
     /// <summary>

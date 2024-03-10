@@ -25,7 +25,7 @@ public class FryingRecipeSO : ScriptableObject
     /// 获取煎炸后物品
     /// </summary>
     /// <returns>煎炸后物品</returns>
-    public KitchenObjectSO GetKitchenObjectSlicesSO()
+    public KitchenObjectSO GetKitchenObjectFriedSO()
     {
         return kitchenObjectFriedSO;
     }

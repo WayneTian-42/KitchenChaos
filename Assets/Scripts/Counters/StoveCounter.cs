@@ -44,7 +44,7 @@ public class StoveCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
     /// <summary>
     /// 哈希表，存储物品以及对应的菜谱
     /// </summary>
-    private Hashtable fryingRecipeSOHT;
+    private Dictionary<KitchenObjectSO, FryingRecipeSO> fryingRecipeSODict;
     /// <summary>
     /// 当前煎炸时间
     /// </summary>
@@ -57,10 +57,10 @@ public class StoveCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
     private void Awake()
     {
         // 根据煎炸菜谱初始化哈希表
-        fryingRecipeSOHT = new Hashtable();
+        fryingRecipeSODict = new Dictionary<KitchenObjectSO, FryingRecipeSO>();
         foreach (FryingRecipeSO fryingRecipeSO in fryingRecipeSOArray)
         {
-            fryingRecipeSOHT.Add(fryingRecipeSO.GetKitchenObjectSO(), fryingRecipeSO);
+            fryingRecipeSODict.Add(fryingRecipeSO.GetKitchenObjectSO(), fryingRecipeSO);
         }
     }
 
@@ -81,25 +81,14 @@ public class StoveCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
                         // 销毁原物品
                         GetKitchenObject().DestroySelf();
                         // 生成煎炸后的物品
-                        KitchenObject.SpawnKitchenObject(fryingRecipeSO.GetKitchenObjectSlicesSO(), this);
+                        KitchenObject.SpawnKitchenObject(fryingRecipeSO.GetKitchenObjectFriedSO(), this);
                         // KitchenObject.SpawnKitchenObject((KitchenObjectSO)cuttingRecipeSOHT[GetKitchenObject().GetKitchenObjectSO()], this);
-                        // 物品煎炸一次后更新菜谱
-                        fryingRecipeSO = (FryingRecipeSO)fryingRecipeSOHT[GetKitchenObject().GetKitchenObjectSO()];
                         // 清零计时器
                         fryingTimer = 0;
+                        // 物品煎炸一次后更新菜谱
+                        objectState = fryingRecipeSODict.TryGetValue(GetKitchenObject().GetKitchenObjectSO(), out fryingRecipeSO) ? State.Fried : State.Burned;
                         // 更新状态
-                        if (fryingRecipeSO != null)
-                        {
-                            objectState = State.Fried;
-                            // 更改显示效果
-                            OnStateChanged?.Invoke(this, new OnStateChangeArgs(objectState));
-                        }
-                        else
-                        {
-                            objectState = State.Burned;
-                            // 更改显示效果
-                            OnStateChanged?.Invoke(this, new OnStateChangeArgs(objectState));
-                        }
+                        OnStateChanged?.Invoke(this, new OnStateChangeArgs(objectState));
                     }
                     break;
                 case State.Fried:
@@ -111,11 +100,13 @@ public class StoveCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
                         // 销毁原物品
                         GetKitchenObject().DestroySelf();
                         // 生成煎炸后的物品
-                        KitchenObject.SpawnKitchenObject(fryingRecipeSO.GetKitchenObjectSlicesSO(), this);
+                        KitchenObject.SpawnKitchenObject(fryingRecipeSO.GetKitchenObjectFriedSO(), this);
                         // 更新状态
                         objectState = State.Burned;
                         // 更改显示效果
                         OnStateChanged?.Invoke(this, new OnStateChangeArgs(objectState));
+                        // 用于隐藏警告UI
+                        OnProgressChanged?.Invoke(this, new IHasProgressBar.OnProgressChangedEvnetArgs(0f));
                     }
                     break;
                 case State.Burned:
@@ -123,7 +114,6 @@ public class StoveCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
             }
         }
     }
-
 
     /// <summary>
     /// 交互函数，角色可以将材料放置在炉灶台上，或者从灶台上拿取物品
@@ -136,9 +126,7 @@ public class StoveCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
             if (player.HasKitchenObject() == true)
             {
                 // // 查询角色手中物品是否能够被煎炸
-                fryingRecipeSO = (FryingRecipeSO)fryingRecipeSOHT[player.GetKitchenObject().GetKitchenObjectSO()];
-                // 物品能被煎炸时才可以放下
-                if (fryingRecipeSO != null)
+                if (fryingRecipeSODict.TryGetValue(player.GetKitchenObject().GetKitchenObjectSO(), out fryingRecipeSO))// 物品能被煎炸时才可以放下
                 {
                     // 更新物品父对象为柜台
                     player.GetKitchenObject().SetKitchenObjectParent(this);
@@ -146,8 +134,8 @@ public class StoveCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
                     fryingTimer = 0;
                     // 更新进度条
                     OnProgressChanged?.Invoke(this, new IHasProgressBar.OnProgressChangedEvnetArgs());
-                    // 更新状态
-                    objectState = State.Frying;
+                    // 根据食物是否能够继续烹饪更新状态
+                    objectState = fryingRecipeSODict.TryGetValue(fryingRecipeSO.GetKitchenObjectFriedSO(), out FryingRecipeSO _) ? State.Frying : State.Fried;
                     // 更改显示效果
                     OnStateChanged?.Invoke(this, new OnStateChangeArgs(objectState));
                 }
@@ -169,6 +157,18 @@ public class StoveCounter : BaseCounter, IKitchenObjectParent, IHasProgressBar
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// 当前物品是否已经煎炸完毕
+    /// </summary>
+    /// <returns>
+    /// true: 已经煎炸
+    /// false: 还未煎炸
+    /// </returns>
+    public bool IsFried()
+    {
+        return objectState == State.Fried;
     }
 
     /// <summary>

@@ -46,7 +46,7 @@ public class GameStartCountdownUI : MonoBehaviour
             // 触发动画
             animator.SetTrigger(NumberPopup);
             // 播放音效
-            SoundManager.Instance.CountDownSound();
+            SoundManager.Instance.PlayWarningSound(Vector3.zero);
         }
     }
 
